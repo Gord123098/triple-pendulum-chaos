@@ -1,6 +1,6 @@
 # Triple Pendulum Chaos Explorer
 
-A high-performance, interactive simulation of a triple pendulum with a real-time stability heatmap. Built with vanilla JavaScript, HTML5 Canvas, and Web Workers.
+A high-performance, interactive simulation of a triple pendulum with a progressive stability heatmap. Built with vanilla JavaScript, HTML5 Canvas, and Web Workers.
 
 ![Screenshot](screenshot.png)
 
@@ -39,7 +39,3 @@ A high-performance, interactive simulation of a triple pendulum with a real-time
     - **Scroll**: Zoom in/out.
     - **⛶**: Toggle fullscreen heatmap.
     - **↺**: Reset heatmap view.
-
-## License
-
-MIT

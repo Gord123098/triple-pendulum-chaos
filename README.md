@@ -16,7 +16,7 @@ A high-performance, interactive simulation of a triple pendulum with a real-time
 ## How to Run
 
 ### Online (GitHub Pages)
-[Link to your deployed site will go here]
+[Live Demo](https://gord123098.github.io/triple-pendulum-chaos/)
 
 ### Locally
 1. Clone this repository.

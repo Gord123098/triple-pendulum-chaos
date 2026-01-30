@@ -1,0 +1,184 @@
+body {
+    margin: 0;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#container {
+    display: flex;
+    width: 95vw;
+    height: 90vh;
+    background: #1e293b;
+    border-radius: 12px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+#simulation-container {
+    flex: 2;
+    position: relative;
+    background: #000;
+    border-right: 1px solid #334155;
+}
+
+#simCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+#overlay {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    pointer-events: none;
+}
+
+h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #38bdf8;
+    text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
+p {
+    margin: 5px 0 0;
+    font-size: 0.9rem;
+    color: #94a3b8;
+}
+
+#controls-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background: #1e293b;
+    overflow-y: auto;
+    min-width: 300px;
+}
+
+#heatmap-container {
+    width: 100%;
+    aspect-ratio: 1;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 20px;
+    cursor: crosshair;
+    border: 1px solid #334155;
+    transition: all 0.3s ease;
+}
+
+/* Fullscreen Heatmap Mode */
+#heatmap-container.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000;
+    border-radius: 0;
+    margin: 0;
+    border: none;
+}
+
+#heatmapCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    image-rendering: pixelated;
+}
+
+#heatmap-ui {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 5px;
+    pointer-events: none;
+    /* Let clicks pass specific areas */
+}
+
+#heatmap-ui button {
+    pointer-events: auto;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 1.2rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin: 0;
+}
+
+#heatmap-ui button:hover {
+    background: rgba(56, 189, 248, 0.8);
+}
+
+#heatmap-status {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    /* moved to bottom right to avoid buttons */
+    background: rgba(0, 0, 0, 0.7);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    pointer-events: none;
+    color: white;
+    display: none;
+    top: auto;
+    /* Reset top from previous overlay style */
+    left: auto;
+    transform: none;
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.control-group label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #cbd5e1;
+}
+
+input[type="range"] {
+    width: 100%;
+    accent-color: #38bdf8;
+}
+
+button {
+    margin-top: 10px;
+    padding: 10px;
+    background: #38bdf8;
+    color: #0f172a;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+button:hover {
+    background: #0ea5e9;
+}

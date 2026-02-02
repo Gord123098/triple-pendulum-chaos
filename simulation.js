@@ -272,169 +272,169 @@ class TriplePendulum {
     // Let's say SHORT click (no drag) = set simulation.
     // I'll handle that in mouseup.
 
-    // Actually, let's keep it simple. dblclick to set state is safer with pan/zoom.
+    // actually, let's keep it simple. dblclick to set state is safer with pan/zoom.
     // The original code had click. I should update that.
-}
 
-reset() {
-    // Start near global stable equilibrium (down) or unstable (up)?
-    // Let's start slightly perturbed from Up-Up-Up for chaos
-    this.state = [Math.PI - 0.1, Math.PI, Math.PI, 0, 0, 0];
-    this.trace = [];
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-}
 
-setupControls() {
-    const bind = (id, param) => {
-        const el = document.getElementById(id);
-        const valEl = document.getElementById(id + '-val');
-        el.addEventListener('input', (e) => {
+    reset() {
+        // Start near global stable equilibrium (down) or unstable (up)?
+        // Let's start slightly perturbed from Up-Up-Up for chaos
+        this.state = [Math.PI - 0.1, Math.PI, Math.PI, 0, 0, 0];
+        this.trace = [];
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    setupControls() {
+        const bind = (id, param) => {
+            const el = document.getElementById(id);
+            const valEl = document.getElementById(id + '-val');
+            el.addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                this.params[param] = val;
+                valEl.textContent = val.toFixed(1);
+                this.scheduleHeatmapUpdate();
+            });
+        };
+
+        bind('m1', 'm1'); bind('m2', 'm2'); bind('m3', 'm3');
+        bind('l1', 'l1'); bind('l2', 'l2'); bind('l3', 'l3');
+        bind('g', 'g');
+
+        const dEl = document.getElementById('d');
+        const dVal = document.getElementById('d-val');
+        dEl.addEventListener('input', (e) => {
             const val = parseFloat(e.target.value);
-            this.params[param] = val;
-            valEl.textContent = val.toFixed(1);
+            this.params.damping = val;
+            dVal.textContent = val.toFixed(2);
             this.scheduleHeatmapUpdate();
         });
-    };
 
-    bind('m1', 'm1'); bind('m2', 'm2'); bind('m3', 'm3');
-    bind('l1', 'l1'); bind('l2', 'l2'); bind('l3', 'l3');
-    bind('g', 'g');
-
-    const dEl = document.getElementById('d');
-    const dVal = document.getElementById('d-val');
-    dEl.addEventListener('input', (e) => {
-        const val = parseFloat(e.target.value);
-        this.params.damping = val;
-        dVal.textContent = val.toFixed(2);
-        this.scheduleHeatmapUpdate();
-    });
-
-    document.getElementById('reset-btn').addEventListener('click', () => {
-        this.reset();
-    });
-}
-
-// Additional Click handling for simulation reset (Short click)
-// We already handled drag in setupInteraction. 
-// We can add a specialized click handler there that checks if it was a drag or not.
-// For now, let's just stick to dblclick for setting state, it's cleaner.
-
-resize() {
-    this.canvas.width = this.canvas.parentElement.clientWidth;
-    this.canvas.height = this.canvas.parentElement.clientHeight;
-}
-
-// Equations of Motion (Lagrangian) needed here
-getDerivatives(state) {
-    // Update physics params in case they changed from UI (optimization: only do this when needed)
-    this.physics.m1 = this.params.m1; this.physics.m2 = this.params.m2; this.physics.m3 = this.params.m3;
-    this.physics.l1 = this.params.l1; this.physics.l2 = this.params.l2; this.physics.l3 = this.params.l3;
-    this.physics.g = this.params.g; this.physics.damping = this.params.damping;
-
-    return this.physics.getDerivatives(state);
-}
-
-rk4(dt) {
-    const k1 = this.getDerivatives(this.state);
-
-    const state2 = this.state.map((s, i) => s + k1[i] * dt * 0.5);
-    const k2 = this.getDerivatives(state2);
-
-    const state3 = this.state.map((s, i) => s + k2[i] * dt * 0.5);
-    const k3 = this.getDerivatives(state3);
-
-    const state4 = this.state.map((s, i) => s + k3[i] * dt);
-    const k4 = this.getDerivatives(state4);
-
-    this.state = this.state.map((s, i) => s + (dt / 6) * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]));
-}
-
-update(dt) {
-    // Run physics sub-steps for stability
-    const subSteps = 10;
-    const subDt = dt / subSteps;
-    for (let i = 0; i < subSteps; i++) {
-        this.rk4(subDt);
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            this.reset();
+        });
     }
-}
 
-draw() {
-    const width = this.canvas.width;
-    const height = this.canvas.height;
-    const ctx = this.ctx;
+    // Additional Click handling for simulation reset (Short click)
+    // We already handled drag in setupInteraction. 
+    // We can add a specialized click handler there that checks if it was a drag or not.
+    // For now, let's just stick to dblclick for setting state, it's cleaner.
 
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'; // Trail effect
-    ctx.fillRect(0, 0, width, height);
+    resize() {
+        this.canvas.width = this.canvas.parentElement.clientWidth;
+        this.canvas.height = this.canvas.parentElement.clientHeight;
+    }
 
-    const cx = width / 2;
-    const cy = height / 3;
-    const scale = Math.min(width, height) / (2 * (this.params.l1 + this.params.l2 + this.params.l3));
+    // Equations of Motion (Lagrangian) needed here
+    getDerivatives(state) {
+        // Update physics params in case they changed from UI (optimization: only do this when needed)
+        this.physics.m1 = this.params.m1; this.physics.m2 = this.params.m2; this.physics.m3 = this.params.m3;
+        this.physics.l1 = this.params.l1; this.physics.l2 = this.params.l2; this.physics.l3 = this.params.l3;
+        this.physics.g = this.params.g; this.physics.damping = this.params.damping;
 
-    const [t1, t2, t3] = this.state;
+        return this.physics.getDerivatives(state);
+    }
 
-    const x1 = cx + this.params.l1 * Math.sin(t1) * scale;
-    const y1 = cy + this.params.l1 * Math.cos(t1) * scale;
+    rk4(dt) {
+        const k1 = this.getDerivatives(this.state);
 
-    const x2 = x1 + this.params.l2 * Math.sin(t2) * scale;
-    const y2 = y1 + this.params.l2 * Math.cos(t2) * scale;
+        const state2 = this.state.map((s, i) => s + k1[i] * dt * 0.5);
+        const k2 = this.getDerivatives(state2);
 
-    const x3 = x2 + this.params.l3 * Math.sin(t3) * scale;
-    const y3 = y2 + this.params.l3 * Math.cos(t3) * scale;
+        const state3 = this.state.map((s, i) => s + k2[i] * dt * 0.5);
+        const k3 = this.getDerivatives(state3);
 
-    // Update trace
-    this.trace.push({ x: x3, y: y3 });
-    if (this.trace.length > this.maxTraceLength) this.trace.shift();
+        const state4 = this.state.map((s, i) => s + k3[i] * dt);
+        const k4 = this.getDerivatives(state4);
 
-    // Draw Trace
-    if (this.trace.length > 1) {
-        ctx.beginPath();
-        ctx.strokeStyle = '#f472b6';
-        ctx.lineWidth = 1;
-        for (let i = 0; i < this.trace.length - 1; i++) {
-            ctx.moveTo(this.trace[i].x, this.trace[i].y);
-            ctx.lineTo(this.trace[i + 1].x, this.trace[i + 1].y);
+        this.state = this.state.map((s, i) => s + (dt / 6) * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]));
+    }
+
+    update(dt) {
+        // Run physics sub-steps for stability
+        const subSteps = 10;
+        const subDt = dt / subSteps;
+        for (let i = 0; i < subSteps; i++) {
+            this.rk4(subDt);
         }
-        ctx.stroke();
     }
 
-    // Draw Arms
-    ctx.beginPath();
-    ctx.strokeStyle = '#cbd5e1';
-    ctx.lineWidth = 2;
-    ctx.moveTo(cx, cy);
-    ctx.lineTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.lineTo(x3, y3);
-    ctx.stroke();
+    draw() {
+        const width = this.canvas.width;
+        const height = this.canvas.height;
+        const ctx = this.ctx;
 
-    // Draw Bobs
-    const drawBob = (x, y, m, color) => {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'; // Trail effect
+        ctx.fillRect(0, 0, width, height);
+
+        const cx = width / 2;
+        const cy = height / 3;
+        const scale = Math.min(width, height) / (2 * (this.params.l1 + this.params.l2 + this.params.l3));
+
+        const [t1, t2, t3] = this.state;
+
+        const x1 = cx + this.params.l1 * Math.sin(t1) * scale;
+        const y1 = cy + this.params.l1 * Math.cos(t1) * scale;
+
+        const x2 = x1 + this.params.l2 * Math.sin(t2) * scale;
+        const y2 = y1 + this.params.l2 * Math.cos(t2) * scale;
+
+        const x3 = x2 + this.params.l3 * Math.sin(t3) * scale;
+        const y3 = y2 + this.params.l3 * Math.cos(t3) * scale;
+
+        // Update trace
+        this.trace.push({ x: x3, y: y3 });
+        if (this.trace.length > this.maxTraceLength) this.trace.shift();
+
+        // Draw Trace
+        if (this.trace.length > 1) {
+            ctx.beginPath();
+            ctx.strokeStyle = '#f472b6';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < this.trace.length - 1; i++) {
+                ctx.moveTo(this.trace[i].x, this.trace[i].y);
+                ctx.lineTo(this.trace[i + 1].x, this.trace[i + 1].y);
+            }
+            ctx.stroke();
+        }
+
+        // Draw Arms
         ctx.beginPath();
-        ctx.fillStyle = color;
-        ctx.arc(x, y, 5 + m * 2, 0, Math.PI * 2);
-        ctx.fill();
-    };
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 2;
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.lineTo(x3, y3);
+        ctx.stroke();
 
-    drawBob(x1, y1, this.params.m1, '#38bdf8');
-    drawBob(x2, y2, this.params.m2, '#fbbf24');
-    drawBob(x3, y3, this.params.m3, '#f472b6');
-}
+        // Draw Bobs
+        const drawBob = (x, y, m, color) => {
+            ctx.beginPath();
+            ctx.fillStyle = color;
+            ctx.arc(x, y, 5 + m * 2, 0, Math.PI * 2);
+            ctx.fill();
+        };
 
-loop(timestamp) {
-    if (!this.lastTime) this.lastTime = timestamp;
-    const dt = (timestamp - this.lastTime) / 1000;
-    this.lastTime = timestamp;
-
-    // Cap dt to prevent explosion on tab switch
-    if (dt < 0.1) {
-        this.update(dt);
-        this.draw();
+        drawBob(x1, y1, this.params.m1, '#38bdf8');
+        drawBob(x2, y2, this.params.m2, '#fbbf24');
+        drawBob(x3, y3, this.params.m3, '#f472b6');
     }
 
-    if (this.running) {
-        requestAnimationFrame(t => this.loop(t));
+    loop(timestamp) {
+        if (!this.lastTime) this.lastTime = timestamp;
+        const dt = (timestamp - this.lastTime) / 1000;
+        this.lastTime = timestamp;
+
+        // Cap dt to prevent explosion on tab switch
+        if (dt < 0.1) {
+            this.update(dt);
+            this.draw();
+        }
+
+        if (this.running) {
+            requestAnimationFrame(t => this.loop(t));
+        }
     }
-}
 }
 
 // Initialize
